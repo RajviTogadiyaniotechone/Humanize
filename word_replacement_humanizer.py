@@ -93,12 +93,13 @@ class WordReplacementHumanizer:
     def replace_words_with_similar(self, sentence):
         """Replace words with similar meanings only"""
         
-        words = sentence.split()
+        # Preserve original sentence structure including newlines and multiple spaces
+        original_words = sentence.split()
         rewritten_words = []
         replacement_count = 0
         
         # Scale replacements based on content length
-        word_count = len(words)
+        word_count = len(original_words)
         if word_count <= 10:
             # Short content: 2-3 words
             min_replacements = 2
@@ -119,7 +120,7 @@ class WordReplacementHumanizer:
         # Track which words we've already replaced to avoid duplicates
         replaced_positions = set()
         
-        for i, word in enumerate(words):
+        for i, word in enumerate(original_words):
             # Clean word for matching (remove punctuation only)
             clean_word = re.sub(r'[^\w]', '', word.lower())
             
@@ -152,9 +153,22 @@ class WordReplacementHumanizer:
         
         # If we didn't meet minimum replacements, force more changes
         if replacement_count < min_replacements:
-            rewritten_words = self.force_minimum_replacements(words, rewritten_words, min_replacements - replacement_count)
+            rewritten_words = self.force_minimum_replacements(original_words, rewritten_words, min_replacements - replacement_count)
         
-        return ' '.join(rewritten_words)
+        # Reconstruct sentence preserving original formatting
+        # Simple approach: replace words directly while preserving whitespace
+        result_sentence = sentence
+        
+        # Replace each word in the original with the corresponding rewritten word
+        for i, (orig_word, rewritten_word) in enumerate(zip(original_words, rewritten_words)):
+            if orig_word != rewritten_word:
+                # Find the position of the original word in the sentence
+                word_start = result_sentence.find(orig_word)
+                if word_start != -1:
+                    # Replace the word with the rewritten word
+                    result_sentence = result_sentence[:word_start] + rewritten_word + result_sentence[word_start + len(orig_word):]
+        
+        return result_sentence
     
     def force_minimum_replacements(self, original_words, rewritten_words, needed_replacements):
         """Force minimum number of word replacements"""
