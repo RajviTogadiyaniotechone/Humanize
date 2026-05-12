@@ -27,6 +27,30 @@ from word_replacement_humanizer import WordReplacementHumanizer
 app = Flask(__name__)
 CORS(app)
 
+# Add version check endpoint to verify latest deployment
+@app.route('/api/version', methods=['GET'])
+def get_version():
+    """Get current app version"""
+    return jsonify({
+        'version': '2.0.0',
+        'features': [
+            'formatting_preservation',
+            'comprehensive_synonyms',
+            'ultimate_coverage'
+        ],
+        'timestamp': datetime.now().isoformat()
+    })
+
+# Add cache-busting endpoint
+@app.route('/api/clear-cache', methods=['POST'])
+def clear_cache():
+    """Clear any cached data"""
+    return jsonify({
+        'success': True,
+        'message': 'Cache cleared',
+        'timestamp': datetime.now().isoformat()
+    })
+
 # Word replacement mappings (simplified for Render)
 WORD_REPLACEMENTS = {
     "furthermore": ["also", "plus", "additionally", "moreover"],

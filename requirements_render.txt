@@ -10,3 +10,5 @@ language-tool-python==2.7.1
 textstat==0.7.3
 yake==0.4.8
 gunicorn==21.2.0
+
+# Cache-busting: 2026-05-12T15:49:41.381655
