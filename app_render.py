@@ -22,6 +22,8 @@ try:
 except:
     pass
 
+from word_replacement_humanizer import WordReplacementHumanizer
+
 app = Flask(__name__)
 CORS(app)
 
@@ -135,8 +137,9 @@ def enhanced_humanize_api():
                 'error': 'Intensity must be between 0 and 1'
             }), 400
         
-        # Perform word replacement humanization
-        result = word_replacement_humanize(text, intensity)
+        # Perform word replacement humanization with formatting preservation
+        humanizer = WordReplacementHumanizer()
+        result = humanizer.word_replacement_humanize(text, intensity)
         
         if not result.get('success'):
             return jsonify({
