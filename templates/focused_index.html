@@ -203,32 +203,24 @@
 
                         <div class="side-by-side">
                             <div>
-                                <h4 class="font-medium text-gray-600 mb-2">Original</h4>
+                                <h3 class="font-medium text-gray-600 mb-2">Original</h3>
                                 <div id="comparisonOriginal" class="text-gray-700 whitespace-pre-wrap"></div>
                             </div>
                             <div>
-                                <h4 class="font-medium text-gray-600 mb-2">Humanized</h4>
+                                <h3 class="font-medium text-gray-600 mb-2">Humanized</h3>
                                 <div id="comparisonHumanized" class="text-gray-700 whitespace-pre-wrap"></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Score and Stats -->
-                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Character Count Only -->
+                <!-- <div class="mt-6 grid grid-cols-1 md:grid-cols-1 gap-4">
                     <div class="glass-effect rounded-lg p-4 text-center">
-                        <div class="text-2xl font-bold gradient-text" id="humanScore">0%</div>
-                        <div class="text-sm text-gray-600">Human Score</div>
+                        <div class="text-2xl font-bold gradient-text" id="charCount">0</div>
+                        <div class="text-sm text-gray-600">Character Count</div>
                     </div>
-                    <div class="glass-effect rounded-lg p-4 text-center">
-                        <div class="text-2xl font-bold text-purple-600" id="changesCount">0</div>
-                        <div class="text-sm text-gray-600">Changes Applied</div>
-                    </div>
-                    <div class="glass-effect rounded-lg p-4 text-center">
-                        <div class="text-2xl font-bold text-green-600" id="qualityScore">Good</div>
-                        <div class="text-sm text-gray-600">Quality</div>
-                    </div>
-                </div>
+                </div> -->
             </div>
 
             <!-- Loading State -->
@@ -314,15 +306,8 @@
             document.getElementById('humanizedContent').textContent = data.humanized_text;
             document.getElementById('humanizedCharCount').textContent = data.character_count;
             
-            // Display scores
-            document.getElementById('humanScore').textContent = Math.round(data.human_score) + '%';
-            document.getElementById('changesCount').textContent = data.changes_applied.length;
-            
-            // Quality assessment
-            const quality = data.human_score >= 85 ? 'Excellent' : 
-                          data.human_score >= 70 ? 'Good' : 
-                          data.human_score >= 50 ? 'Fair' : 'Needs Work';
-            document.getElementById('qualityScore').textContent = quality;
+            // Character count display only
+            // Character count is already displayed above
             
             // Apply highlighting for comparison
             applyComparisonHighlighting();
