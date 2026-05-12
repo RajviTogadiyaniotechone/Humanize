@@ -24,7 +24,42 @@ except:
 
 # CACHE-BUSTING TIMESTAMP: 2026-05-12T16:18:49.070594
 
-def preserve_formatting_simple(text, humanized_text):
+def preserve_formatting_production(text, humanized_text):
+    """Production-ready format preservation"""
+    
+    # Split both texts by words
+    words = text.split()
+    humanized_words = humanized_text.split()
+    
+    # If word counts don't match, return humanized as-is
+    if len(words) != len(humanized_words):
+        return humanized_text
+    
+    # Rebuild preserving original formatting character by character
+    result = []
+    text_chars = list(text)
+    word_start = 0
+    
+    for i, char in enumerate(text_chars):
+        if char.isspace() or i == len(text_chars) - 1:
+            # Found whitespace or end of text
+            if i > word_start:
+                # Extract word from original
+                original_word = ''.join(text_chars[word_start:i])
+                
+                # Find corresponding humanized word
+                word_index = len([w for w in words[:len(words)] if w == original_word])
+                if word_index < len(humanized_words):
+                    humanized_word = humanized_words[word_index]
+                    
+                    # Replace characters in result
+                    for j in range(len(original_word)):
+                        if word_start + j < len(text_chars):
+                            text_chars[word_start + j] = humanized_word[j] if j < len(humanized_word) else original_word[j]
+            
+            word_start = i + 1
+    
+    return ''.join(text_chars)
     """Simple format preservation that works with deployed logic"""
     
     # Split both texts by words
@@ -82,7 +117,15 @@ def debug_formatting():
     humanizer = WordReplacementHumanizer()
     result = humanizer.word_replacement_humanize(text, intensity=0.7)
     
-    original_newlines = text.count('\n')
+    original_newlines = text.count('\
+# Production configuration
+app.config['DEBUG'] = False
+app.config['ENV'] = 'production'
+
+# Disable development server warning
+import warnings
+warnings.filterwarnings("ignore", message="This is a development server")
+n')
     original_spaces = text.count('  ')
     
     if result['success']:
@@ -245,7 +288,7 @@ def enhanced_humanize_api():
         if result['success']:
             original_text = text
             humanized_text = result['humanized_text']
-            result['humanized_text'] = preserve_formatting_simple(original_text, humanized_text)
+            result['humanized_text'] = preserve_formatting_production(original_text, humanized_text)
         
         if not result.get('success'):
             return jsonify({
