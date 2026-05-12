@@ -22,6 +22,7 @@ try:
 except:
     pass
 
+# CACHE-BUSTING TIMESTAMP: 2026-05-12T16:18:49.070594
 from word_replacement_humanizer import WordReplacementHumanizer
 
 app = Flask(__name__)
@@ -32,14 +33,66 @@ CORS(app)
 def get_version():
     """Get current app version"""
     return jsonify({
-        'version': '2.0.0',
+        'version': '2.1.0',
         'features': [
             'formatting_preservation',
             'comprehensive_synonyms',
-            'ultimate_coverage'
+            'ultimate_coverage',
+            'aggressive_cache_busting'
         ],
-        'timestamp': datetime.now().isoformat()
+        'timestamp': datetime.now().isoformat(),
+        'commit_hash': 'e8ca89b',
+        'debug_info': {
+            'formatting_method': 'string_replacement',
+            'newline_support': True,
+            'space_preservation': True
+        }
     })
+
+# Add debug endpoint to verify formatting preservation
+@app.route('/api/debug-formatting', methods=['POST'])
+def debug_formatting():
+    """Debug formatting preservation"""
+    data = request.get_json()
+    text = data.get('text', '')
+    
+    humanizer = WordReplacementHumanizer()
+    result = humanizer.word_replacement_humanize(text, intensity=0.7)
+    
+    original_newlines = text.count('\n')
+    original_spaces = text.count('  ')
+    
+    if result['success']:
+        output_text = result['humanized_text']
+        output_newlines = output_text.count('\n')
+        output_spaces = output_text.count('  ')
+        
+        return jsonify({
+            'success': True,
+            'debug_info': {
+                'original': {
+                    'text': text,
+                    'newlines': original_newlines,
+                    'spaces': original_spaces,
+                    'repr': repr(text)
+                },
+                'humanized': {
+                    'text': output_text,
+                    'newlines': output_newlines,
+                    'spaces': output_spaces,
+                    'repr': repr(output_text)
+                },
+                'preservation': {
+                    'newlines_preserved': original_newlines == output_newlines,
+                    'spaces_preserved': original_spaces == output_spaces
+                }
+            }
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'error': result.get('error', 'Debug failed')
+        })
 
 # Add cache-busting endpoint
 @app.route('/api/clear-cache', methods=['POST'])
