@@ -156,17 +156,14 @@ class WordReplacementHumanizer:
             rewritten_words = self.force_minimum_replacements(original_words, rewritten_words, min_replacements - replacement_count)
         
         # Reconstruct sentence preserving original formatting
-        # Simple approach: replace words directly while preserving whitespace
+        # Simple and reliable approach
         result_sentence = sentence
         
-        # Replace each word in the original with the corresponding rewritten word
+        # Replace each word with its corresponding rewritten word
         for i, (orig_word, rewritten_word) in enumerate(zip(original_words, rewritten_words)):
             if orig_word != rewritten_word:
-                # Find the position of the original word in the sentence
-                word_start = result_sentence.find(orig_word)
-                if word_start != -1:
-                    # Replace the word with the rewritten word
-                    result_sentence = result_sentence[:word_start] + rewritten_word + result_sentence[word_start + len(orig_word):]
+                # Use string replace to preserve exact formatting
+                result_sentence = result_sentence.replace(orig_word, rewritten_word)
         
         return result_sentence
     
