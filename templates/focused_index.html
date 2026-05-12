@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Content Humanizer - Focused Mode</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #b5bde4 0%, #c5a1ea 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #b5bde4 0%, #c5a1ea 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .btn-gradient {
+            background: linear-gradient(135deg, #b5bde4 0%, #c5a1ea 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #9ba3d3 0%, #b581da 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .side-by-side {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        @media (max-width: 768px) {
+            .side-by-side {
+                grid-template-columns: 1fr;
+            }
+        }
+        .highlight-red { background-color: #fee2e2; }
+        .highlight-green { background-color: #dcfce7; }
+        .highlight-yellow { background-color: #fef3c7; }
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #b5bde4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        .toast.show {
+            transform: translateX(0);
+        }
+        .toast.success {
+            border-left: 4px solid #28a745;
+        }
+        .toast.error {
+            border-left: 4px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 max-w-7xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">
+                <i class="fas fa-magic mr-2"></i>AI Content Humanizer
+            </h1>
+            <p class="text-white/90 text-lg">
+                Transform AI content into natural, human-like writing
+            </p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="glass-effect rounded-2xl shadow-2xl p-6 md:p-8">
+            <!-- Input Section -->
+            <div class="mb-6">
+                <label class="block text-lg font-semibold text-gray-700 mb-3">
+                    <i class="fas fa-edit mr-2"></i>AI Content
+                </label>
+                <textarea 
+                    id="inputText" 
+                    placeholder="Paste your AI content here..."
+                    class="w-full h-40 p-4 border-2 border-gray-200 rounded-lg focus:border-purple-400 focus:outline-none resize-none text-gray-700"
+                ></textarea>
+                
+                <!-- Character Count -->
+                <div class="mt-2 text-right text-sm text-gray-600">
+                    <span id="charCount">0</span> characters
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <div class="mb-6">
+                <button 
+                    onclick="humanizeContent()" 
+                    id="humanizeBtn"
+                    class="w-full btn-gradient text-white py-4 px-6 rounded-lg font-semibold shadow-lg text-lg"
+                >
+                    <i class="fas fa-wand-magic-sparkles mr-2"></i>Humanize Content
+                </button>
+            </div>
+
+            <!-- Side-by-Side Results -->
+            <div id="resultsSection" class="hidden">
+                <div class="side-by-side">
+                    <!-- Original Content -->
+                    <div class="glass-effect rounded-xl p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-700">
+                                <i class="fas fa-robot mr-2"></i>Original AI Content
+                            </h3>
+                            <button 
+                                onclick="copyOriginal()" 
+                                class="text-purple-600 hover:text-purple-700 transition-colors"
+                                title="Copy original text"
+                            >
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <div id="originalContent" class="text-gray-700 whitespace-pre-wrap"></div>
+                        <div class="mt-3 text-sm text-gray-500">
+                            <span id="originalCharCount">0</span> characters
+                        </div>
+                    </div>
+
+                    <!-- Humanized Content -->
+                    <div class="glass-effect rounded-xl p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-700">
+                                <i class="fas fa-user mr-2"></i>Humanized Content
+                            </h3>
+                            <button 
+                                onclick="copyHumanized()" 
+                                class="text-purple-600 hover:text-purple-700 transition-colors"
+                                title="Copy humanized text"
+                            >
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <div id="humanizedContent" class="text-gray-700 whitespace-pre-wrap"></div>
+                        <div class="mt-3 text-sm text-gray-500">
+                            <span id="humanizedCharCount">0</span> characters
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Toggle -->
+                <div class="mt-6 text-center">
+                    <button 
+                        onclick="toggleComparison()" 
+                        id="comparisonBtn"
+                        class="bg-purple-100 text-purple-700 px-6 py-3 rounded-lg font-medium hover:bg-purple-200 transition-colors"
+                    >
+                        <i class="fas fa-eye mr-2"></i>Show Comparison
+                    </button>
+                </div>
+
+                <!-- Comparison View -->
+                <div id="comparisonSection" class="hidden mt-6">
+                    <div class="glass-effect rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">
+                            <i class="fas fa-compress-alt mr-2"></i>Comparison View
+                        </h3>
+                        
+                        <!-- Legend -->
+                        <div class="mb-4 flex flex-wrap gap-4 text-sm">
+                            <span class="flex items-center">
+                                <span class="w-4 h-4 bg-red-200 rounded mr-2"></span>
+                                Removed words
+                            </span>
+                            <span class="flex items-center">
+                                <span class="w-4 h-4 bg-green-200 rounded mr-2"></span>
+                                Added words
+                            </span>
+                            <span class="flex items-center">
+                                <span class="w-4 h-4 bg-yellow-200 rounded mr-2"></span>
+                                Changed words
+                            </span>
+                        </div>
+
+                        <div class="side-by-side">
+                            <div>
+                                <h4 class="font-medium text-gray-600 mb-2">Original</h4>
+                                <div id="comparisonOriginal" class="text-gray-700 whitespace-pre-wrap"></div>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-600 mb-2">Humanized</h4>
+                                <div id="comparisonHumanized" class="text-gray-700 whitespace-pre-wrap"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Score and Stats -->
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="glass-effect rounded-lg p-4 text-center">
+                        <div class="text-2xl font-bold gradient-text" id="humanScore">0%</div>
+                        <div class="text-sm text-gray-600">Human Score</div>
+                    </div>
+                    <div class="glass-effect rounded-lg p-4 text-center">
+                        <div class="text-2xl font-bold text-purple-600" id="changesCount">0</div>
+                        <div class="text-sm text-gray-600">Changes Applied</div>
+                    </div>
+                    <div class="glass-effect rounded-lg p-4 text-center">
+                        <div class="text-2xl font-bold text-green-600" id="qualityScore">Good</div>
+                        <div class="text-sm text-gray-600">Quality</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="hidden text-center py-8">
+                <div class="loading-spinner mx-auto mb-4"></div>
+                <p class="text-gray-600">Humanizing your content...</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        let currentResults = null;
+        let comparisonVisible = false;
+
+        // Character counter
+        document.getElementById('inputText').addEventListener('input', function() {
+            document.getElementById('charCount').textContent = this.value.length;
+        });
+
+        // Humanize content function
+        async function humanizeContent() {
+            const inputText = document.getElementById('inputText').value.trim();
+            
+            if (!inputText) {
+                showToast('Please enter some text to humanize', 'error');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('resultsSection').classList.add('hidden');
+            
+            try {
+                const response = await fetch('/api/enhanced-humanize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: inputText,
+                        keywords: [],
+                        intensity: 0.8,
+                        target_score: 0.9,
+                        show_analysis: false,
+                        preserve_words: false,
+                        preserve_punctuation: false,
+                        rewriting_mode: false,
+                        focused_mode: true  // Always use focused mode
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentResults = data;
+                    displayResults(data);
+                    showToast('Content humanized successfully!', 'success');
+                } else {
+                    showToast(data.error || 'Humanization failed', 'error');
+                }
+            } catch (error) {
+                showToast('Network error. Please try again.', 'error');
+            } finally {
+                document.getElementById('loadingState').classList.add('hidden');
+            }
+        }
+
+        // Display results
+        function displayResults(data) {
+            // Show results section
+            document.getElementById('resultsSection').classList.remove('hidden');
+            
+            // Display original content
+            document.getElementById('originalContent').textContent = data.original_text;
+            document.getElementById('originalCharCount').textContent = data.original_text.length;
+            
+            // Display humanized content
+            document.getElementById('humanizedContent').textContent = data.humanized_text;
+            document.getElementById('humanizedCharCount').textContent = data.character_count;
+            
+            // Display scores
+            document.getElementById('humanScore').textContent = Math.round(data.human_score) + '%';
+            document.getElementById('changesCount').textContent = data.changes_applied.length;
+            
+            // Quality assessment
+            const quality = data.human_score >= 85 ? 'Excellent' : 
+                          data.human_score >= 70 ? 'Good' : 
+                          data.human_score >= 50 ? 'Fair' : 'Needs Work';
+            document.getElementById('qualityScore').textContent = quality;
+            
+            // Apply highlighting for comparison
+            applyComparisonHighlighting();
+        }
+
+        // Toggle comparison view
+        function toggleComparison() {
+            comparisonVisible = !comparisonVisible;
+            const comparisonSection = document.getElementById('comparisonSection');
+            const comparisonBtn = document.getElementById('comparisonBtn');
+            
+            if (comparisonVisible) {
+                comparisonSection.classList.remove('hidden');
+                comparisonBtn.innerHTML = '<i class="fas fa-eye-slash mr-2"></i>Hide Comparison';
+                comparisonBtn.classList.add('bg-purple-200');
+            } else {
+                comparisonSection.classList.add('hidden');
+                comparisonBtn.innerHTML = '<i class="fas fa-eye mr-2"></i>Show Comparison';
+                comparisonBtn.classList.remove('bg-purple-200');
+            }
+        }
+
+        // Apply comparison highlighting
+        function applyComparisonHighlighting() {
+            if (!currentResults) return;
+            
+            const original = currentResults.original_text;
+            const humanized = currentResults.humanized_text;
+            
+            // Simple word comparison for highlighting
+            const originalWords = original.match(/\b\w+\b/g) || [];
+            const humanizedWords = humanized.match(/\b\w+\b/g) || [];
+            
+            const originalSet = new Set(originalWords.map(w => w.toLowerCase()));
+            const humanizedSet = new Set(humanizedWords.map(w => w.toLowerCase()));
+            
+            const removed = originalSet.subtract(humanizedSet);
+            const added = humanizedSet.subtract(originalSet);
+            
+            // Highlight original text
+            let highlightedOriginal = original;
+            removed.forEach(word => {
+                const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                highlightedOriginal = highlightedOriginal.replace(regex, `<span class="highlight-red">$&</span>`);
+            });
+            
+            // Highlight humanized text
+            let highlightedHumanized = humanized;
+            added.forEach(word => {
+                const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                highlightedHumanized = highlightedHumanized.replace(regex, `<span class="highlight-green">$&</span>`);
+            });
+            
+            document.getElementById('comparisonOriginal').innerHTML = highlightedOriginal;
+            document.getElementById('comparisonHumanized').innerHTML = highlightedHumanized;
+        }
+
+        // Copy functions
+        function copyOriginal() {
+            if (currentResults) {
+                navigator.clipboard.writeText(currentResults.original_text);
+                showToast('Original text copied!', 'success');
+            }
+        }
+
+        function copyHumanized() {
+            if (currentResults) {
+                navigator.clipboard.writeText(currentResults.humanized_text);
+                showToast('Humanized text copied!', 'success');
+            }
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Polyfill for Set.subtract
+        if (!Set.prototype.subtract) {
+            Set.prototype.subtract = function(other) {
+                const result = new Set(this);
+                for (const item of other) {
+                    result.delete(item);
+                }
+                return result;
+            };
+        }
+    </script>
+</body>
+</html>

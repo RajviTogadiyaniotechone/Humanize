@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced AI Content Humanizer - 100% Human Results</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #b5bde4 0%, #c5a1ea 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .score-circle {
+            transition: all 0.3s ease;
+        }
+        
+        .score-circle.excellent {
+            color: #10b981;
+        }
+        
+        .score-circle.good {
+            color: #3b82f6;
+        }
+        
+        .score-circle.fair {
+            color: #f59e0b;
+        }
+        
+        .score-circle.poor {
+            color: #ef4444;
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg,  #b5bde4 0%, #c5a1ea 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #b5bde4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .highlight-change {
+            background-color: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        
+        .tab-active {
+            border-bottom: 2px solid  #b5bde4 ;
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-4">
+        <!-- Header -->
+        <header class="glass-morphism rounded-2xl p-6 mb-6 shadow-2xl">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-4xl font-bold gradient-text mb-2">
+                            <i class="fas fa-magic mr-3"></i>Enhanced AI Content Humanizer
+                        </h1>
+                        <p class="text-gray-600 text-lg">Transform AI content into 100% human-like text • Bypass AI detectors • Optimize for SEO</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-green-500">100%</div>
+                            <div class="text-sm text-gray-600">Human Score</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-red-500">0%</div>
+                            <div class="text-sm text-gray-600">AI Detection</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left Panel - Input & Controls -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Input Section -->
+                    <div class="glass-morphism rounded-2xl p-6 shadow-xl">
+                        <h2 class="text-xl font-semibold mb-4 flex items-center">
+                            <i class="fas fa-edit mr-2 text-purple-600"></i>
+                            Input Content
+                        </h2>
+                        <textarea 
+                            id="inputText" 
+                            placeholder="Paste your AI-generated content here..."
+                            class="w-full h-48 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                        ></textarea>
+                        <div class="mt-3 flex justify-between items-center">
+                            <span id="charCount" class="text-sm text-gray-500">0 characters</span>
+                            <button onclick="clearInput()" class="text-sm text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash mr-1"></i>Clear
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Settings Panel -->
+                    <div class="glass-morphism rounded-2xl p-6 shadow-xl">
+                        <h2 class="text-xl font-semibold mb-4 flex items-center">
+                            <i class="fas fa-sliders-h mr-2 text-purple-600"></i>
+                            Humanization Settings
+                        </h2>
+                        
+                        <!-- Intensity Slider -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Intensity Level: <span id="intensityValue" class="font-bold">0.7</span>
+                            </label>
+                            <input 
+                                type="range" 
+                                id="intensitySlider" 
+                                min="0.1" 
+                                max="1.0" 
+                                step="0.1" 
+                                value="0.7"
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                            >
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>Light</span>
+                                <span>Moderate</span>
+                                <span>Strong</span>
+                            </div>
+                        </div>
+
+                        <!-- Target Score -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Target Human Score: <span id="targetScoreValue" class="font-bold">95%</span>
+                            </label>
+                            <input 
+                                type="range" 
+                                id="targetScoreSlider" 
+                                min="50" 
+                                max="100" 
+                                step="5" 
+                                value="95"
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                            >
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>50%</span>
+                                <span>75%</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+
+                        <!-- Keywords -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-key mr-1"></i>SEO Keywords (optional)
+                            </label>
+                            <input 
+                                type="text" 
+                                id="keywordsInput" 
+                                placeholder="Enter keywords separated by commas"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            >
+                        </div>
+
+                        <!-- Options -->
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="showAnalysis" checked class="mr-2 text-purple-600">
+                                <span class="text-sm">Show detailed analysis</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="preserveFormatting" checked class="mr-2 text-purple-600">
+                                <span class="text-sm">Preserve formatting</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="autoOptimize" checked class="mr-2 text-purple-600">
+                                <span class="text-sm">Auto-optimize for target score</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="space-y-3">
+                        <button 
+                            onclick="humanizeContent()" 
+                            id="humanizeBtn"
+                            class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-6 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg"
+                        >
+                            <i class="fas fa-magic mr-2"></i>
+                            <span id="btnText">Humanize Content</span>
+                        </button>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <button 
+                                onclick="analyzeText()" 
+                                class="bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                            >
+                                <i class="fas fa-search mr-2"></i>Analyze
+                            </button>
+                            <button 
+                                onclick="exportResults()" 
+                                class="bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                            >
+                                <i class="fas fa-download mr-2"></i>Export
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel - Results -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Score Display -->
+                    <div class="glass-morphism rounded-2xl p-6 shadow-xl">
+                        <h2 class="text-xl font-semibold mb-4 flex items-center">
+                            <i class="fas fa-chart-line mr-2 text-purple-600"></i>
+                            Humanization Results
+                        </h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="text-center">
+                                <div class="score-circle text-4xl font-bold mb-2" id="humanScore">--</div>
+                                <div class="text-sm text-gray-600">Human Score</div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                    <div id="humanScoreBar" class="progress-bar bg-green-500 h-2 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="score-circle text-4xl font-bold mb-2" id="aiScore">--</div>
+                                <div class="text-sm text-gray-600">AI Detection Risk</div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                    <div id="aiScoreBar" class="progress-bar bg-red-500 h-2 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="score-circle text-4xl font-bold mb-2" id="similarityScore">--</div>
+                                <div class="text-sm text-gray-600">Semantic Similarity</div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                    <div id="similarityBar" class="progress-bar bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <div class="text-2xl font-bold text-gray-700" id="wordCount">0</div>
+                                <div class="text-xs text-gray-500">Words</div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <div class="text-2xl font-bold text-gray-700" id="sentenceCount">0</div>
+                                <div class="text-xs text-gray-500">Sentences</div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <div class="text-2xl font-bold text-gray-700" id="readabilityScore">0</div>
+                                <div class="text-xs text-gray-500">Readability</div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <div class="text-2xl font-bold text-gray-700" id="changesCount">0</div>
+                                <div class="text-xs text-gray-500">Changes</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Tabs -->
+                    <div class="glass-morphism rounded-2xl shadow-xl">
+                        <div class="border-b border-gray-200">
+                            <nav class="flex space-x-8 px-6">
+                                <button onclick="switchTab('output')" id="outputTab" class="py-4 px-1 border-b-2 font-medium text-sm tab-active">
+                                    <i class="fas fa-file-alt mr-2"></i>Humanized Output
+                                </button>
+                                <button onclick="switchTab('comparison')" id="comparisonTab" class="py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-columns mr-2"></i>Comparison
+                                </button>
+                                <button onclick="switchTab('analysis')" id="analysisTab" class="py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-microscope mr-2"></i>Analysis
+                                </button>
+                                <button onclick="switchTab('changes')" id="changesTab" class="py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-history mr-2"></i>Changes
+                                </button>
+                            </nav>
+                        </div>
+
+                        <!-- Tab Content -->
+                        <div class="p-6">
+                            <!-- Output Tab -->
+                            <div id="outputContent" class="tab-content">
+                                <div class="mb-4 flex justify-between items-center">
+                                    <h3 class="text-lg font-semibold">Humanized Text</h3>
+                                    <button onclick="copyToClipboard('humanized')" class="text-sm bg-purple-100 text-purple-700 px-3 py-1 rounded-lg hover:bg-purple-200">
+                                        <i class="fas fa-copy mr-1"></i>Copy
+                                    </button>
+                                </div>
+                                <div id="humanizedText" class="bg-gray-50 rounded-lg p-4 min-h-[200px] whitespace-pre-wrap">
+                                    Humanized content will appear here...
+                                </div>
+                            </div>
+
+                            <!-- Comparison Tab -->
+                            <div id="comparisonContent" class="tab-content hidden">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <h3 class="text-lg font-semibold mb-3">Original Text</h3>
+                                        <div id="originalTextCompare" class="bg-red-50 rounded-lg p-4 min-h-[200px] whitespace-pre-wrap">
+                                            Original text will appear here...
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-semibold mb-3">Humanized Text</h3>
+                                        <div id="humanizedTextCompare" class="bg-green-50 rounded-lg p-4 min-h-[200px] whitespace-pre-wrap">
+                                            Humanized text will appear here...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Analysis Tab -->
+                            <div id="analysisContent" class="tab-content hidden">
+                                <div id="analysisDetails" class="space-y-4">
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <h3 class="text-lg font-semibold mb-3">AI Pattern Analysis</h3>
+                                        <div id="aiPatterns" class="space-y-2">
+                                            Analysis will appear here...
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <h3 class="text-lg font-semibold mb-3">Human Indicators</h3>
+                                        <div id="humanIndicators" class="space-y-2">
+                                            Human indicators will appear here...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Changes Tab -->
+                            <!-- <div id="changesContent" class="tab-content hidden">
+                                <div class="mb-4">
+                                    <h3 class="text-lg font-semibold mb-3">Changes Applied</h3>
+                                    <div id="changesList" class="space-y-2">
+                                        Changes will appear here...
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h3 class="text-lg font-semibold mb-3">Context Analysis</h3>
+                                    <div id="contextAnalysis" class="space-y-2">
+                                        Context analysis will appear here...
+                                    </div>
+                                </div> 
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white rounded-lg p-8 shadow-2xl">
+                <div class="loading-spinner mx-auto mb-4"></div>
+                <p class="text-gray-700 font-semibold">Humanizing content...</p>
+                <p class="text-gray-500 text-sm mt-2">This may take a few seconds</p>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg hidden z-50">
+            <div class="flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span id="toastMessage">Success!</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentResults = null;
+        let currentTab = 'output';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup event listeners
+            document.getElementById('inputText').addEventListener('input', updateCharCount);
+            document.getElementById('intensitySlider').addEventListener('input', updateIntensityDisplay);
+            document.getElementById('targetScoreSlider').addEventListener('input', updateTargetScoreDisplay);
+            
+            // Initial displays
+            updateCharCount();
+            updateIntensityDisplay();
+            updateTargetScoreDisplay();
+        });
+
+        function updateCharCount() {
+            const text = document.getElementById('inputText').value;
+            document.getElementById('charCount').textContent = `${text.length} characters`;
+        }
+
+        function updateIntensityDisplay() {
+            const value = document.getElementById('intensitySlider').value;
+            document.getElementById('intensityValue').textContent = value;
+        }
+
+        function updateTargetScoreDisplay() {
+            const value = document.getElementById('targetScoreSlider').value;
+            document.getElementById('targetScoreValue').textContent = `${value}%`;
+        }
+
+        function clearInput() {
+            document.getElementById('inputText').value = '';
+            updateCharCount();
+            showToast('Input cleared');
+        }
+
+        async function humanizeContent() {
+            const inputText = document.getElementById('inputText').value.trim();
+            
+            if (!inputText) {
+                showToast('Please enter some text to humanize', 'error');
+                return;
+            }
+
+            // Show loading
+            showLoading(true);
+            const btn = document.getElementById('humanizeBtn');
+            const btnText = document.getElementById('btnText');
+            btn.disabled = true;
+            btnText.textContent = 'Processing...';
+
+            try {
+                const keywords = document.getElementById('keywordsInput').value
+                    .split(',')
+                    .map(k => k.trim())
+                    .filter(k => k);
+
+                const response = await fetch('/api/enhanced-humanize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: inputText,
+                        keywords: keywords,
+                        intensity: parseFloat(document.getElementById('intensitySlider').value),
+                        target_score: parseFloat(document.getElementById('targetScoreSlider').value) / 100,
+                        show_analysis: document.getElementById('showAnalysis').checked
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentResults = data;
+                    displayResults(data);
+                    showToast('Content humanized successfully!');
+                } else {
+                    showToast(data.error || 'Humanization failed', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred during processing', 'error');
+            } finally {
+                showLoading(false);
+                btn.disabled = false;
+                btnText.textContent = 'Humanize Content';
+            }
+        }
+
+        async function analyzeText() {
+            const inputText = document.getElementById('inputText').value.trim();
+            
+            if (!inputText) {
+                showToast('Please enter some text to analyze', 'error');
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                const response = await fetch('/api/analyze-text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: inputText
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayAnalysis(data.analysis);
+                    showToast('Analysis complete!');
+                } else {
+                    showToast(data.error || 'Analysis failed', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred during analysis', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displayResults(results) {
+            // Update scores
+            updateScore('humanScore', 'humanScoreBar', results.human_score, 'excellent');
+            updateScore('aiScore', 'aiScoreBar', 100 - results.human_score, 'poor');
+            updateScore('similarityScore', 'similarityBar', results.analysis?.semantic_similarity || 0, 'good');
+
+            // Update stats
+            document.getElementById('wordCount').textContent = results.stats.humanized_length;
+            document.getElementById('sentenceCount').textContent = results.stats.humanized_length;
+            document.getElementById('readabilityScore').textContent = results.analysis?.readability_score || 0;
+            document.getElementById('changesCount').textContent = results.changes_applied.length;
+
+            // Update text content
+            document.getElementById('humanizedText').textContent = results.humanized_text;
+            document.getElementById('originalTextCompare').textContent = results.original_text;
+            document.getElementById('humanizedTextCompare').textContent = results.humanized_text;
+
+            // Update analysis
+            if (results.analysis) {
+                displayAnalysisDetails(results.analysis);
+            }
+
+            // Update changes
+            displayChanges(results.changes_applied, results.context_info);
+        }
+
+        function updateScore(elementId, barId, score, quality) {
+            const element = document.getElementById(elementId);
+            const bar = document.getElementById(barId);
+            
+            element.textContent = `${Math.round(score)}%`;
+            bar.style.width = `${score}%`;
+            
+            element.className = `score-circle text-4xl font-bold mb-2 ${quality}`;
+        }
+
+        function displayAnalysis(analysis) {
+            // Switch to analysis tab
+            switchTab('analysis');
+            
+            // Display analysis details
+            displayAnalysisDetails(analysis);
+        }
+
+        function displayAnalysisDetails(analysis) {
+            // AI Patterns
+            const aiPatterns = document.getElementById('aiPatterns');
+            aiPatterns.innerHTML = '';
+            
+            if (analysis.ai_detection) {
+                Object.entries(analysis.ai_detection.patterns).forEach(([type, data]) => {
+                    const item = document.createElement('div');
+                    item.className = 'flex justify-between items-center p-2 bg-white rounded';
+                    item.innerHTML = `
+                        <span class="text-sm">${type.replace('_', ' ')}</span>
+                        <span class="text-sm font-semibold">${data.count}</span>
+                    `;
+                    aiPatterns.appendChild(item);
+                });
+            }
+
+            // Human Indicators
+            const humanIndicators = document.getElementById('humanIndicators');
+            humanIndicators.innerHTML = '';
+            
+            if (analysis.human_quality) {
+                Object.entries(analysis.human_quality.indicators).forEach(([type, data]) => {
+                    const item = document.createElement('div');
+                    item.className = 'flex justify-between items-center p-2 bg-white rounded';
+                    item.innerHTML = `
+                        <span class="text-sm">${type.replace('_', ' ')}</span>
+                        <span class="text-sm font-semibold">${data.count}</span>
+                    `;
+                    humanIndicators.appendChild(item);
+                });
+            }
+        }
+
+        function displayChanges(changes, context) {
+            const changesList = document.getElementById('changesList');
+            changesList.innerHTML = '';
+            
+            changes.forEach(change => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center p-2 bg-white rounded';
+                item.innerHTML = `
+                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                    <span class="text-sm">${change.replace('_', ' ')}</span>
+                `;
+                changesList.appendChild(item);
+            });
+
+            // Context analysis
+            const contextAnalysis = document.getElementById('contextAnalysis');
+            contextAnalysis.innerHTML = '';
+            
+            if (context) {
+                Object.entries(context).forEach(([key, value]) => {
+                    const item = document.createElement('div');
+                    item.className = 'flex justify-between items-center p-2 bg-white rounded';
+                    item.innerHTML = `
+                        <span class="text-sm">${key}</span>
+                        <span class="text-sm font-semibold">${value}</span>
+                    `;
+                    contextAnalysis.appendChild(item);
+                });
+            }
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('[id$="Tab"]').forEach(tab => {
+                tab.classList.remove('tab-active', 'text-gray-900');
+                tab.classList.add('text-gray-500');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + 'Content').classList.remove('hidden');
+            
+            // Add active class to selected tab button
+            const activeTab = document.getElementById(tabName + 'Tab');
+            activeTab.classList.add('tab-active', 'text-gray-900');
+            activeTab.classList.remove('text-gray-500');
+            
+            currentTab = tabName;
+        }
+
+        function copyToClipboard(type) {
+            const text = type === 'humanized' ? 
+                document.getElementById('humanizedText').textContent :
+                document.getElementById('originalTextCompare').textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Text copied to clipboard!');
+            }).catch(() => {
+                showToast('Failed to copy text', 'error');
+            });
+        }
+
+        function exportResults() {
+            if (!currentResults) {
+                showToast('No results to export', 'error');
+                return;
+            }
+
+            // In a real implementation, this would call the export API
+            const exportData = {
+                results: [currentResults],
+                timestamp: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `humanization_results_${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('Results exported successfully!');
+        }
+
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (show) {
+                overlay.classList.remove('hidden');
+            } else {
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            
+            if (type === 'error') {
+                toast.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            } else {
+                toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            }
+            
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'Enter':
+                        e.preventDefault();
+                        humanizeContent();
+                        break;
+                    case 'k':
+                        e.preventDefault();
+                        clearInput();
+                        break;
+                    case 'c':
+                        if (currentTab === 'output') {
+                            e.preventDefault();
+                            copyToClipboard('humanized');
+                        }
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
