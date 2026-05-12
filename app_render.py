@@ -23,6 +23,29 @@ except:
     pass
 
 # CACHE-BUSTING TIMESTAMP: 2026-05-12T16:18:49.070594
+
+def preserve_formatting_simple(text, humanized_text):
+    """Simple format preservation that works with deployed logic"""
+    
+    # Split both texts by words
+    words = text.split()
+    humanized_words = humanized_text.split()
+    
+    # If word counts don't match, return humanized as-is
+    if len(words) != len(humanized_words):
+        return humanized_text
+    
+    # Rebuild preserving original formatting
+    result = text
+    
+    # Replace each word while preserving exact whitespace
+    for i, (orig_word, human_word) in enumerate(zip(words, humanized_words)):
+        if orig_word != human_word:
+            # Use simple string replace to preserve formatting
+            result = result.replace(orig_word, human_word, 1)  # Only replace first occurrence
+    
+    return result
+
 from word_replacement_humanizer import WordReplacementHumanizer
 
 app = Flask(__name__)
@@ -217,6 +240,12 @@ def enhanced_humanize_api():
         # Perform word replacement humanization with formatting preservation
         humanizer = WordReplacementHumanizer()
         result = humanizer.word_replacement_humanize(text, intensity)
+        
+        # Apply format preservation to maintain newlines and spaces
+        if result['success']:
+            original_text = text
+            humanized_text = result['humanized_text']
+            result['humanized_text'] = preserve_formatting_simple(original_text, humanized_text)
         
         if not result.get('success'):
             return jsonify({
