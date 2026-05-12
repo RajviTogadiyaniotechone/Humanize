@@ -233,15 +233,33 @@ def replace_words_with_similar(sentence):
     words = sentence.split()
     rewritten_words = []
     replacement_count = 0
-    min_replacements = max(3, len(words) // 4)
+    
+    # Scale replacements based on content length
+    word_count = len(words)
+    if word_count <= 10:
+        # Short content: 2-3 words
+        min_replacements = 2
+        max_replacements = 3
+    elif word_count <= 20:
+        # Medium content: 3-5 words
+        min_replacements = 3
+        max_replacements = 5
+    elif word_count <= 30:
+        # Long content: 4-7 words
+        min_replacements = 4
+        max_replacements = 7
+    else:
+        # Very long content: 5-10 words (1 per 3-4 words)
+        min_replacements = max(5, word_count // 4)
+        max_replacements = max(10, word_count // 3)
     
     for i, word in enumerate(words):
         # Clean word for matching
         clean_word = re.sub(r'[^\w]', '', word.lower())
         
         # Check for word replacement
-        if clean_word in WORD_REPLACEMENTS and replacement_count < min_replacements:
-            if random.random() < 0.95 or replacement_count == 0:
+        if clean_word in WORD_REPLACEMENTS and replacement_count < max_replacements:
+            if random.random() < 0.95 or replacement_count < min_replacements:
                 alternatives = WORD_REPLACEMENTS[clean_word]
                 replacement = random.choice(alternatives)
                 
