@@ -117,15 +117,7 @@ def debug_formatting():
     humanizer = WordReplacementHumanizer()
     result = humanizer.word_replacement_humanize(text, intensity=0.7)
     
-    original_newlines = text.count('\
-# Production configuration
-app.config['DEBUG'] = False
-app.config['ENV'] = 'production'
-
-# Disable development server warning
-import warnings
-warnings.filterwarnings("ignore", message="This is a development server")
-n')
+    original_newlines = text.count('\n')
     original_spaces = text.count('  ')
     
     if result['success']:
