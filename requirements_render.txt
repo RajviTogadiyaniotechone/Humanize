@@ -10,7 +10,7 @@ language-tool-python==2.7.1
 textstat==0.7.3
 yake==0.4.8
 gunicorn==21.2.0
-
+#https://ai-humanizer-1jea.onrender.com(live url)
 # Cache-busting: 2026-05-12T15:49:41.381655
 # AGGRESSIVE CACHE-BUSTING: 2026-05-12T16:18:49.057723
 # FORCE UPDATE: v2.1.0-20260512161849
