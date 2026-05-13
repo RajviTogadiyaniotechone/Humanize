@@ -1,24 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Content Humanizer - Simple & Clean</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background: linear-gradient(135deg,  #b5bde4 0%, #c5a1ea 100%);
+            background: linear-gradient(135deg, #b5bde4 0%, #c5a1ea 100%);
         }
+
         .glass-effect {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .score-good { color: #10b981; }
-        .score-medium { color: #f59e0b; }
-        .score-poor { color: #ef4444; }
+
+        .score-good {
+            color: #10b981;
+        }
+
+        .score-medium {
+            color: #f59e0b;
+        }
+
+        .score-poor {
+            color: #ef4444;
+        }
     </style>
 </head>
+
 <body class="min-h-screen p-4">
     <div class="max-w-6xl mx-auto">
         <!-- Header -->
@@ -27,7 +40,8 @@
                 <h1 class="text-3xl font-bold text-gray-800 mb-2">
                     🤖 AI Content Humanizer
                 </h1>
-                <p class="text-gray-600">Transform AI content into natural human text • Preserve meaning • Remove AI patterns</p>
+                <p class="text-gray-600">Transform AI content into natural human text • Preserve meaning • Remove AI
+                    patterns</p>
             </div>
         </header>
 
@@ -40,11 +54,8 @@
                     <h2 class="text-xl font-semibold mb-4 text-gray-800">
                         📝 Original AI Content
                     </h2>
-                    <textarea 
-                        id="inputText" 
-                        placeholder="Paste your AI-generated content here..."
-                        class="w-full h-48 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                    ></textarea>
+                    <textarea id="inputText" placeholder="Paste your AI-generated content here..."
+                        class="w-full h-48 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"></textarea>
                     <div class="mt-2 flex justify-between items-center">
                         <span id="charCount" class="text-sm text-gray-500">0 characters</span>
                         <button onclick="clearInput()" class="text-sm text-red-500 hover:text-red-700">
@@ -58,22 +69,15 @@
                     <h2 class="text-xl font-semibold mb-4 text-gray-800">
                         ⚙️ Settings
                     </h2>
-                    
+
                     <div class="space-y-4">
                         <!-- Intensity -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Humanization Level: <span id="intensityValue" class="font-bold">Medium</span>
                             </label>
-                            <input 
-                                type="range" 
-                                id="intensitySlider" 
-                                min="1" 
-                                max="5" 
-                                step="1" 
-                                value="3"
-                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                            >
+                            <input type="range" id="intensitySlider" min="1" max="5" step="1" value="3"
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                             <div class="flex justify-between text-xs text-gray-500 mt-1">
                                 <span>Light</span>
                                 <span>Medium</span>
@@ -86,12 +90,8 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 🎯 Keywords (optional)
                             </label>
-                            <input 
-                                type="text" 
-                                id="keywordsInput" 
-                                placeholder="Enter keywords separated by commas"
-                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            >
+                            <input type="text" id="keywordsInput" placeholder="Enter keywords separated by commas"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                         </div>
 
                         <!-- Humanization Mode Selection -->
@@ -101,7 +101,8 @@
                             </label>
                             <div class="space-y-2">
                                 <label class="flex items-center">
-                                    <input type="radio" name="mode" value="enhanced" checked class="mr-2 text-purple-600">
+                                    <input type="radio" name="mode" value="enhanced" checked
+                                        class="mr-2 text-purple-600">
                                     <span class="text-sm text-gray-700">
                                         🔄 Enhanced (words + structure + punctuation)
                                     </span>
@@ -130,11 +131,8 @@
                 </div>
 
                 <!-- Action Button -->
-                <button 
-                    onclick="humanizeContent()" 
-                    id="humanizeBtn"
-                    class="w-full bg-gradient-to-r from-purple-500 to-pink-400 text-white py-4 px-6 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg text-lg"
-                >
+                <button onclick="humanizeContent()" id="humanizeBtn"
+                    class="w-full bg-gradient-to-r from-purple-500 to-pink-400 text-white py-4 px-6 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg text-lg">
                     🔄 Humanize Content
                 </button>
             </div>
@@ -146,7 +144,7 @@
                     <h2 class="text-xl font-semibold mb-4 text-gray-800">
                         📊 Results
                     </h2>
-                    
+
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="text-center">
                             <div id="humanScore" class="text-3xl font-bold mb-1">--%</div>
@@ -169,18 +167,21 @@
                         <h2 class="text-xl font-semibold text-gray-800">
                             ✨ Humanized Text
                         </h2>
-                        <button onclick="copyToClipboard()" class="text-sm bg-purple-100 text-purple-700 px-3 py-1 rounded-lg hover:bg-purple-200">
+                        <button onclick="copyToClipboard()"
+                            class="text-sm bg-purple-100 text-purple-700 px-3 py-1 rounded-lg hover:bg-purple-200">
                             📋 Copy
                         </button>
                     </div>
-                    <div id="humanizedText" class="bg-gray-50 rounded-lg p-4 min-h-[200px] whitespace-pre-wrap text-gray-700">
+                    <div id="humanizedText"
+                        class="bg-gray-50 rounded-lg p-4 min-h-[200px] whitespace-pre-wrap text-gray-700">
                         Humanized content will appear here...
                     </div>
                 </div>
 
                 <!-- Comparison Toggle -->
                 <div class="glass-effect rounded-xl p-4 shadow-lg">
-                    <button onclick="toggleComparison()" class="w-full text-left font-medium text-gray-700 hover:text-gray-900">
+                    <button onclick="toggleComparison()"
+                        class="w-full text-left font-medium text-gray-700 hover:text-gray-900">
                         🔍 Show/Hide Comparison
                     </button>
                     <div id="comparisonSection" class="hidden mt-4 space-y-3">
@@ -192,23 +193,23 @@
                             <h3 class="font-medium text-gray-700 mb-2">Humanized:</h3>
                             <div id="humanizedCompare" class="bg-green-50 rounded p-3 text-sm text-gray-600"></div>
                         </div>
-                        
+
                         <!-- Mode-Specific Info -->
                         <div id="preservationInfo" class="hidden mt-3 p-3 bg-blue-50 rounded">
                             <h4 class="font-medium text-gray-700 mb-1">🔒 Word Preservation</h4>
                             <div class="text-sm text-gray-600">Words Preserved: --%</div>
                         </div>
-                        
+
                         <div id="punctuationInfo" class="hidden mt-3 p-3 bg-green-50 rounded">
                             <h4 class="font-medium text-gray-700 mb-1">📝 Punctuation Preservation</h4>
                             <div class="text-sm text-gray-600">Punctuation Preserved: --%</div>
                         </div>
-                        
+
                         <div id="wordsChangedInfo" class="hidden mt-3 p-3 bg-yellow-50 rounded">
                             <h4 class="font-medium text-gray-700 mb-1">🔄 Word Changes</h4>
                             <div class="text-sm text-gray-600">Words Changed: --</div>
                         </div>
-                        
+
                         <div id="changesHighlightInfo" class="hidden mt-3 p-3 bg-purple-50 rounded">
                             <h4 class="font-medium text-gray-700 mb-1">🎨 Changes Highlighted</h4>
                             <div class="text-sm text-gray-600">
@@ -242,7 +243,7 @@
         let currentResults = null;
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('inputText').addEventListener('input', updateCharCount);
             document.getElementById('intensitySlider').addEventListener('input', updateIntensityDisplay);
             updateCharCount();
@@ -268,7 +269,7 @@
 
         async function humanizeContent() {
             const inputText = document.getElementById('inputText').value.trim();
-            
+
             if (!inputText) {
                 showToast('Please enter some text to humanize', 'error');
                 return;
@@ -283,10 +284,10 @@
                     .filter(k => k);
 
                 const intensity = document.getElementById('intensitySlider').value / 5; // Convert to 0.2-1.0
-                
+
                 // Get selected mode
                 const selectedMode = document.querySelector('input[name="mode"]:checked').value;
-                
+
                 const response = await fetch('/api/enhanced-humanize', {
                     method: 'POST',
                     headers: {
@@ -326,17 +327,17 @@
             // Update scores
             const humanScore = Math.round(results.human_score);
             const aiScore = Math.round(100 - results.human_score);
-            
+
             document.getElementById('humanScore').textContent = `${humanScore}%`;
             document.getElementById('aiScore').textContent = `${aiScore}%`;
-            
+
             // Update score colors
             const humanScoreEl = document.getElementById('humanScore');
             const aiScoreEl = document.getElementById('aiScore');
-            
-            humanScoreEl.className = 'text-3xl font-bold mb-1 ' + 
+
+            humanScoreEl.className = 'text-3xl font-bold mb-1 ' +
                 (humanScore >= 80 ? 'score-good' : humanScore >= 60 ? 'score-medium' : 'score-poor');
-            aiScoreEl.className = 'text-3xl font-bold mb-1 ' + 
+            aiScoreEl.className = 'text-3xl font-bold mb-1 ' +
                 (aiScore <= 20 ? 'score-good' : aiScore <= 40 ? 'score-medium' : 'score-poor');
 
             // Update changes info
@@ -345,13 +346,13 @@
 
             // Update text content
             document.getElementById('humanizedText').textContent = results.humanized_text;
-            
+
             // Highlight changes in comparison
             const originalText = document.getElementById('inputText').value;
             const highlightedComparison = highlightChanges(originalText, results.humanized_text);
             document.getElementById('originalCompare').innerHTML = highlightedComparison.original;
             document.getElementById('humanizedCompare').innerHTML = highlightedComparison.humanized;
-            
+
             // Show mode-specific info
             if (results.words_preserved) {
                 const preservationInfo = document.getElementById('preservationInfo');
@@ -360,7 +361,7 @@
                     preservationInfo.classList.remove('hidden');
                 }
             }
-            
+
             if (results.punctuation_preserved) {
                 const punctuationInfo = document.getElementById('punctuationInfo');
                 if (punctuationInfo) {
@@ -368,7 +369,7 @@
                     punctuationInfo.classList.remove('hidden');
                 }
             }
-            
+
             if (results.words_changed !== undefined) {
                 const wordsChangedInfo = document.getElementById('wordsChangedInfo');
                 if (wordsChangedInfo) {
@@ -376,7 +377,7 @@
                     wordsChangedInfo.classList.remove('hidden');
                 }
             }
-            
+
             // Show changes highlight info
             const changesHighlightInfo = document.getElementById('changesHighlightInfo');
             if (changesHighlightInfo) {
@@ -388,48 +389,48 @@
             // Split into words preserving punctuation
             const originalWords = original.match(/\b\w+\b/g) || [];
             const humanizedWords = humanized.match(/\b\w+\b/g) || [];
-            
+
             // Create word maps with original forms
             const originalMap = new Map();
             const humanizedMap = new Map();
-            
+
             originalWords.forEach((word, index) => {
                 const cleanWord = word.toLowerCase();
                 if (!originalMap.has(cleanWord)) {
                     originalMap.set(cleanWord, []);
                 }
-                originalMap.get(cleanWord).push({word, index});
+                originalMap.get(cleanWord).push({ word, index });
             });
-            
+
             humanizedWords.forEach((word, index) => {
                 const cleanWord = word.toLowerCase();
                 if (!humanizedMap.has(cleanWord)) {
                     humanizedMap.set(cleanWord, []);
                 }
-                humanizedMap.get(cleanWord).push({word, index});
+                humanizedMap.get(cleanWord).push({ word, index });
             });
-            
+
             // Find changes
             const originalSet = new Set(originalWords.map(w => w.toLowerCase()));
             const humanizedSet = new Set(humanizedWords.map(w => w.toLowerCase()));
-            
+
             const removedWords = [...originalSet].filter(word => !humanizedSet.has(word));
             const addedWords = [...humanizedSet].filter(word => !originalSet.has(word));
-            
+
             // Highlight original text (removed words in red)
             let highlightedOriginal = original;
             removedWords.forEach(word => {
                 const regex = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
                 highlightedOriginal = highlightedOriginal.replace(regex, `<span class="bg-red-200 px-1 rounded">$&</span>`);
             });
-            
+
             // Highlight humanized text (added words in green, changed in yellow)
             let highlightedHumanized = humanized;
             const processedWords = new Set();
-            
+
             humanizedWords.forEach(wordObj => {
                 const cleanWord = wordObj.word.toLowerCase();
-                
+
                 if (addedWords.includes(cleanWord)) {
                     // Added word - highlight in green
                     const regex = new RegExp(`\\b${wordObj.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g');
@@ -439,7 +440,7 @@
                     // Check if word form changed
                     const originalForms = originalMap.get(cleanWord) || [];
                     const originalForm = originalForms[0]?.word || word;
-                    
+
                     if (originalForm.toLowerCase() !== wordObj.word.toLowerCase()) {
                         // Changed word - highlight in yellow
                         const regex = new RegExp(`\\b${wordObj.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g');
@@ -448,7 +449,7 @@
                     }
                 }
             });
-            
+
             return {
                 original: highlightedOriginal,
                 humanized: highlightedHumanized
@@ -462,7 +463,7 @@
 
         function copyToClipboard() {
             const text = document.getElementById('humanizedText').textContent;
-            
+
             navigator.clipboard.writeText(text).then(() => {
                 showToast('Text copied to clipboard!');
             }).catch(() => {
@@ -473,7 +474,7 @@
         function showLoading(show) {
             const overlay = document.getElementById('loadingOverlay');
             const btn = document.getElementById('humanizeBtn');
-            
+
             if (show) {
                 overlay.classList.remove('hidden');
                 btn.disabled = true;
@@ -488,26 +489,26 @@
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
-            
+
             toastMessage.textContent = message;
-            
+
             if (type === 'error') {
                 toast.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
             } else {
                 toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
             }
-            
+
             toast.classList.remove('hidden');
-            
+
             setTimeout(() => {
                 toast.classList.add('hidden');
             }, 3000);
         }
 
         // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.ctrlKey || e.metaKey) {
-                switch(e.key) {
+                switch (e.key) {
                     case 'Enter':
                         e.preventDefault();
                         humanizeContent();
@@ -525,4 +526,5 @@
         });
     </script>
 </body>
+
 </html>
