@@ -170,7 +170,7 @@ COMPREHENSIVE_SYNONYMS = {
     "need": ["require", "demand", "necessitate", "call for", "involve", "entail", "obligate", "compel", "force", "impel"],
     "have": ["possess", "own", "hold", "contain", "include", "comprise", "embody", "embrace", "encompass", "incorporate"],
     "do": ["perform", "execute", "carry out", "implement", "accomplish", "achieve", "complete", "fulfill", "conduct", "undertake"],
-    "be": ["exist", "live", "occur", "happen", "take place", "transpire", "transpire", "transpire", "transpire", "transpire"],
+    "be": ["exist", "become", "occur", "happen", "take place", "transpire", "transpire", "transpire", "transpire", "transpire"],
     "go": ["proceed", "advance", "progress", "continue", "move forward", "journey", "travel", "head", "proceed", "proceed"],
     "come": ["arrive", "approach", "reach", "enter", "appear", "show up", "present", "emerge", "materialize", "surface"]
 }
