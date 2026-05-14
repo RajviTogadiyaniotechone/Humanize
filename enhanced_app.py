@@ -64,35 +64,96 @@ def enhanced_humanize_api():
         if not 0.5 <= target_score <= 1.0:
             return jsonify({'error': 'Target score must be between 0.5 and 1.0'}), 400
         
+        def process_with_newlines(text, humanizer_func, **kwargs):
+            """Process text while preserving newlines/paragraphs"""
+            parts = re.split(r'(\n+)', text)
+            humanized_parts = []
+            total_human_score = 0
+            valid_parts_count = 0
+            all_changes_applied = set()
+            total_words_preserved = 0
+            total_punctuation_preserved = 0
+            total_words_changed = 0
+
+            for part in parts:
+                if not part.strip():
+                    humanized_parts.append(part)
+                    continue
+                
+                result = humanizer_func(text=part, **kwargs)
+                
+                if result.get('success', False) or 'humanized_text' in result:
+                    humanized_parts.append(result.get('humanized_text', part))
+                    
+                    if 'human_score' in result and result['human_score'] > 0:
+                        total_human_score += result['human_score']
+                        valid_parts_count += 1
+                        
+                    if 'changes_applied' in result:
+                        if isinstance(result['changes_applied'], (list, set)):
+                            all_changes_applied.update(result['changes_applied'])
+                            
+                    if 'words_preserved' in result:
+                        total_words_preserved += result.get('words_preserved', 0)
+                    if 'punctuation_preserved' in result:
+                        total_punctuation_preserved += result.get('punctuation_preserved', 0)
+                    if 'words_changed' in result:
+                        total_words_changed += result.get('words_changed', 0)
+                else:
+                    humanized_parts.append(part)
+
+            avg_score = total_human_score / valid_parts_count if valid_parts_count > 0 else 0
+            
+            final_result = {
+                'success': True,
+                'original_text': text,
+                'humanized_text': ''.join(humanized_parts),
+                'human_score': avg_score,
+                'changes_applied': list(all_changes_applied)
+            }
+            if total_words_preserved > 0:
+                final_result['words_preserved'] = total_words_preserved
+            if total_punctuation_preserved > 0:
+                final_result['punctuation_preserved'] = total_punctuation_preserved
+            if total_words_changed > 0:
+                final_result['words_changed'] = total_words_changed
+                
+            return final_result
+
         # Choose humanizer based on options
         if preserve_punctuation:
             # Use linguistic-only humanizer (words + structure only, no punctuation)
-            result = linguistic_humanizer.linguistic_only_humanize(
-                text=text,
+            result = process_with_newlines(
+                text,
+                linguistic_humanizer.linguistic_only_humanize,
                 intensity=intensity
             )
         elif preserve_words:
             # Use structure-only humanizer (preserves all words, changes structure/punctuation)
-            result = structure_humanizer.structure_only_humanize(
-                text=text,
+            result = process_with_newlines(
+                text,
+                structure_humanizer.structure_only_humanize,
                 intensity=intensity
             )
         elif rewriting_mode:
             # Use rewriting humanizer (active sentence rewriting, natural language)
-            result = rewriting_humanizer.advanced_rewriting_humanize(
-                text=text,
+            result = process_with_newlines(
+                text,
+                rewriting_humanizer.advanced_rewriting_humanize,
                 intensity=intensity
             )
         elif focused_mode:
             # Use word-replacement humanizer (change words with similar meanings only)
-            result = word_replacement_humanizer.word_replacement_humanize(
-                text=text,
+            result = process_with_newlines(
+                text,
+                word_replacement_humanizer.word_replacement_humanize,
                 intensity=intensity
             )
         else:
             # Use enhanced humanizer (changes words + structure + punctuation)
-            result = humanizer.advanced_humanize(
-                text=text,
+            result = process_with_newlines(
+                text,
+                humanizer.advanced_humanize,
                 keywords=keywords,
                 intensity=intensity,
                 target_score=target_score
@@ -181,21 +242,46 @@ def batch_humanize_api():
         results = []
         for i, text in enumerate(texts):
             try:
-                result = humanizer.advanced_humanize(
-                    text=text,
-                    keywords=keywords,
-                    intensity=intensity,
-                    target_score=target_score
-                )
+                # Use same process_with_newlines logic
+                parts = re.split(r'(\n+)', text)
+                humanized_parts = []
+                total_human_score = 0
+                valid_parts_count = 0
+                all_changes_applied = set()
+                
+                for part in parts:
+                    if not part.strip():
+                        humanized_parts.append(part)
+                        continue
+                    
+                    result = humanizer.advanced_humanize(
+                        text=part,
+                        keywords=keywords,
+                        intensity=intensity,
+                        target_score=target_score
+                    )
+                    
+                    if result.get('success', False) or 'humanized_text' in result:
+                        humanized_parts.append(result.get('humanized_text', part))
+                        if 'human_score' in result and result['human_score'] > 0:
+                            total_human_score += result['human_score']
+                            valid_parts_count += 1
+                        if 'changes_applied' in result:
+                            if isinstance(result['changes_applied'], (list, set)):
+                                all_changes_applied.update(result['changes_applied'])
+                    else:
+                        humanized_parts.append(part)
+                
+                avg_score = total_human_score / valid_parts_count if valid_parts_count > 0 else 0
                 
                 results.append({
                     'index': i,
-                    'success': result['success'],
-                    'original_text': result['original_text'],
-                    'humanized_text': result['humanized_text'],
-                    'human_score': result['human_score'],
-                    'target_score': result['target_score'],
-                    'changes_applied': result['changes_applied']
+                    'success': True,
+                    'original_text': text,
+                    'humanized_text': ''.join(humanized_parts),
+                    'human_score': avg_score,
+                    'target_score': target_score * 100,
+                    'changes_applied': list(all_changes_applied)
                 })
             
             except Exception as e:
